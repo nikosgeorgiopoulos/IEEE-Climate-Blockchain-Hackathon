@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Batches · ProofOfAir</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><circle cx='16' cy='16' r='14' fill='%2322c55e'/></svg>">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+  <main class="page">
+    <div class="page-head">
+      <div>
+        <h1>Anchored batches</h1>
+        <p>Each batch is one Merkle root committing to every reading in it — published in a single transaction.</p>
+      </div>
+      <button class="btn primary" id="btn-batch" title="DEMO_MODE only">Close a batch now</button>
+    </div>
+    <section class="grid cols-4">
+      <div class="stat"><div class="label">Batches</div><div class="value" id="b-total">–</div><div class="sub" id="b-anchored">–</div></div>
+      <div class="stat"><div class="label">Readings committed</div><div class="value" id="b-leaves">–</div><div class="sub" id="b-avg">–</div></div>
+      <div class="stat"><div class="label">Anchor backend</div><div class="value" id="b-backend" style="font-size:22px">–</div><div class="sub" id="b-backend-sub">–</div></div>
+      <div class="stat"><div class="label">Next batch</div><div class="value" id="b-next">–</div><div class="sub" id="b-unbatched">–</div></div>
+    </section>
+    <section class="card" style="margin-top:18px">
+      <div class="table-wrap" style="max-height:none">
+        <table>
+          <thead><tr>
+            <th>#</th><th>Closed</th><th>Period (UTC)</th><th class="num">Leaves</th><th>Merkle root</th>
+            <th>Backend</th><th>Status</th><th class="num">Block</th><th>Transaction</th>
+          </tr></thead>
+          <tbody id="rows"><tr><td colspan="9" class="empty">loading…</td></tr></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+  <script src="/js/api.js"></script>
+  <script src="/js/batches.js"></script>
+</body>
+</html>

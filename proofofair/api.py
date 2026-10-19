@@ -8,7 +8,7 @@ from datetime import datetime, timedelta
 from pathlib import Path
 
 from fastapi import Body, FastAPI, HTTPException, Query
-from fastapi.responses import JSONResponse
+from fastapi.responses import FileResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 
 from . import __version__, batcher, db, scheduler
@@ -227,6 +227,18 @@ def batch(batch_id: int):
     out = _batch_out(b, _labels())
     out.update(leaf_count=stats["n"], device_count=stats["devices"], sample_reading_ids=sample)
     return out
+
+
+@app.get("/api/batches/{batch_id}/ots")
+def batch_ots(batch_id: int):
+    """Download the OpenTimestamps proof; verify it at https://opentimestamps.org."""
+    from .anchor.ots import OtsBackend
+
+    _, ots_path = OtsBackend().paths(batch_id)
+    if not ots_path.exists():
+        raise _404("OpenTimestamps proof")
+    return FileResponse(ots_path, media_type="application/octet-stream",
+                        filename=ots_path.name)
 
 
 @app.get("/api/mockchain/{batch_id}")
