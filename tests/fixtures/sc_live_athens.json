@@ -1,0 +1,42 @@
+[
+  {
+    "id": 21998765432,
+    "sampling_rate": null,
+    "timestamp": "2026-10-19 11:01:48",
+    "location": {"id": 18302, "latitude": "37.976", "longitude": "23.736", "altitude": "95.0",
+                 "country": "GR", "exact_location": 0, "indoor": 0},
+    "sensor": {"id": 36001, "pin": "1", "sensor_type": {"id": 14, "name": "SDS011",
+               "manufacturer": "Nova Fitness"}},
+    "sensordatavalues": [
+      {"id": 1, "value": "4.47", "value_type": "P1"},
+      {"id": 2, "value": "2.78", "value_type": "P2"}
+    ]
+  },
+  {
+    "id": 21998765433,
+    "timestamp": "2026-10-19 11:01:52",
+    "location": {"id": 18302, "latitude": "37.976", "longitude": "23.736"},
+    "sensor": {"id": 36002, "sensor_type": {"id": 17, "name": "BME280"}},
+    "sensordatavalues": [
+      {"value": "21.30", "value_type": "temperature"},
+      {"value": "58.10", "value_type": "humidity"},
+      {"value": "100230.00", "value_type": "pressure"}
+    ]
+  },
+  {
+    "id": 21998765434,
+    "timestamp": "2026-10-19 11:03:10",
+    "location": {"id": 7711, "latitude": "38.0105", "longitude": "23.6702"},
+    "sensor": {"id": 15020, "sensor_type": {"name": "SDS011"}},
+    "sensordatavalues": [
+      {"value": "31.9", "value_type": "P1"},
+      {"value": "not-a-number", "value_type": "P2"}
+    ]
+  },
+  {"id": 1, "timestamp": "garbage", "location": {"id": 5}, "sensordatavalues": []},
+  {"id": 2, "timestamp": "2026-10-19 11:02:00", "location": {"id": 99, "latitude": "37.9",
+   "longitude": "23.7"}, "sensor": {"id": 3, "sensor_type": {"name": "SDS011"}},
+   "sensordatavalues": [{"value": "-5", "value_type": "P2"}, {"value": "5000", "value_type": "P1"}]},
+  {"id": 3, "location": null, "sensordatavalues": null},
+  "not even an object"
+]

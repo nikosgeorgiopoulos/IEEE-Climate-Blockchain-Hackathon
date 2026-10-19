@@ -1,0 +1,21 @@
+# secrets
+.env
+firmware/esp32_node/secrets.h
+
+# runtime data (database, keys, mock chain, caches)
+*.db
+*.db-wal
+*.db-shm
+data/
+data/keys/
+anchors/*.ots
+anchors/*.ots.bak
+anchors/*.bin
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
