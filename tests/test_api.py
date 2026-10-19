@@ -158,3 +158,15 @@ def test_device_ingest(client):
 def test_static_frontend_served(client):
     r = client.get("/")
     assert r.status_code == 200 and "ProofOfAir" in r.text
+
+
+def test_ots_download_and_mockchain_404(client, seeded):
+    assert client.get("/api/batches/1/ots").status_code == 404
+    assert client.get("/api/mockchain/999").status_code == 404
+    from proofofair.anchor.ots import OtsBackend
+
+    _, ots_path = OtsBackend().paths(1)
+    ots_path.parent.mkdir(parents=True, exist_ok=True)
+    ots_path.write_bytes(b"\x00OpenTimestamps")
+    r = client.get("/api/batches/1/ots")
+    assert r.status_code == 200 and r.content == b"\x00OpenTimestamps"

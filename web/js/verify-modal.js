@@ -104,10 +104,12 @@ const Verify = {
           el("span", {}, "This value is exactly what was signed at capture, committed in the batch and anchored on the public ledger.")));
     }
     if (report.status === "tampered") {
-      const step = report.checks.find((c) => c.step === report.first_failed_step);
+      const failed = report.checks.filter((c) => c.status === "fail");
+      const steps = failed.map((c) => c.step);
+      const which = steps.length === 1 ? `step ${steps[0]}` : `steps ${steps.slice(0, -1).join(", ")} & ${steps[steps.length - 1]}`;
       return el("div", { class: "verdict bad" }, el("div", { class: "big" }, "✗"),
-        el("div", {}, el("b", {}, `Tampering detected — failed at step ${report.first_failed_step}`),
-          el("span", {}, step ? `${step.name}: ${step.detail}` : "")));
+        el("div", {}, el("b", {}, `Tampering detected — ${which} failed`),
+          el("span", {}, failed.map((c) => c.name).join(" · "))));
     }
     return el("div", { class: "verdict warn" }, el("div", { class: "big" }, "…"),
       el("div", {}, el("b", {}, "Signed — waiting for anchoring"),
@@ -119,17 +121,17 @@ const Verify = {
     const leafBad = report.stored_leaf_hash && report.leaf_hash !== report.stored_leaf_hash;
     const dl = el("dl", { class: "evidence" });
     const add = (k, v, cls) => dl.append(el("dt", {}, k), el("dd", { class: cls || null }, v ?? "–"));
-    add("Signer", `${report.signer === "gateway" ? "ProofOfAir gateway" : "device key"} · ${fmt.hash(report.pubkey_hex, 16)}`);
-    add("Signature", fmt.hash(report.signature_hex, 24));
-    add("Leaf (recomputed)", fmt.hash(report.leaf_hash, 24), leafBad ? "bad" : null);
-    if (report.stored_leaf_hash) add("Leaf (committed)", fmt.hash(report.stored_leaf_hash, 24));
+    add("Signer", `${report.signer === "gateway" ? "gateway key" : "device key"} · ${fmt.hash(report.pubkey_hex, 10)}`);
+    add("Signature", fmt.hash(report.signature_hex, 18));
+    add("Leaf (recomputed)", fmt.hash(report.leaf_hash, 18), leafBad ? "bad" : null);
+    if (report.stored_leaf_hash) add("Leaf (committed)", fmt.hash(report.stored_leaf_hash, 18));
     if (report.merkle_root) {
-      add("Merkle root", el("span", {}, fmt.hash(report.merkle_root, 24), " ",
+      add("Merkle root", el("span", {}, fmt.hash(report.merkle_root, 14), " ",
         el("button", { class: "btn sm icon", title: "Copy root", onclick: () => copyText(report.merkle_root) }, "⧉")));
     }
     if (report.batch_id) add("Batch", `#${report.batch_id} · leaf ${report.leaf_index}`);
     if (a.backend) add("Anchor", `${a.backend} · ${a.status}${a.block ? ` · block ${a.block}` : ""}`);
-    if (a.tx) add("Transaction", fmt.hash(a.tx, 24));
+    if (a.tx) add("Transaction", fmt.hash(a.tx, 18));
 
     const wrap = el("div", {}, dl);
 

@@ -9,7 +9,7 @@ setup:      ## create the virtualenv, install deps, create .env from the example
 	$(PYTHON) -m venv $(VENV)
 	$(PY) -m pip install --upgrade pip
 	$(PY) -m pip install -r requirements.txt -r requirements-dev.txt
-	cp -n .env.example .env || true
+	test -f .env || cp .env.example .env
 
 keys:       ## gateway + simulated device keys
 	$(PY) scripts/gen_keys.py

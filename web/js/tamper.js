@@ -62,6 +62,7 @@ async function selectReading() {
   showReading(await API.get(`/api/readings/${id}`));
   $("verify-out").replaceChildren(el("div", { class: "empty" }, "Press ", el("b", {}, "Verify"), " to check this reading, or tamper with it first."));
   $("explain").replaceChildren();
+  $("evidence").replaceChildren();
 }
 
 function showReading(r) {
@@ -135,9 +136,16 @@ async function runVerify() {
   if (!state.reading) return;
   setBusy(true);
   try {
-    const report = await Verify.run(state.reading.id, $("verify-out"));
+    $("evidence").replaceChildren();
+    $("verify-card").style.minHeight = "calc(100vh - 180px)"; // room to scroll the checks into view
+    document.querySelector(".lab-controls").scrollIntoView({ behavior: "smooth", block: "start" });
+    const report = await Verify.run(state.reading.id, $("verify-out"), { compact: true });
     $("verify-meta").textContent = `reading #${report.reading_id} · ${new Date().toLocaleTimeString()}`;
     explain(report);
+    $("evidence").replaceChildren(
+      el("details", { class: "box" }, el("summary", {}, "Evidence: hashes, Merkle proof, anchor"),
+        el("div", { class: "inner" }, Verify.evidence(report)))
+    );
   } catch (e) {
     toast(`Verify failed: ${e.message}`);
   } finally {

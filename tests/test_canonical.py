@@ -12,7 +12,13 @@ SPEC_EXAMPLE = (
 )
 
 # Shared with firmware/esp32_node/README.md — the ESP32 must produce these exact bytes.
+# The key is RFC 8032 test vector 1: public only, never use it for a real device.
 ESP32_SEED_HEX = "9d61b19deffd5a60ba844af492ec2cc44449c5697b326919703bac031cae7f60"
+ESP32_PUB_HEX = "d75a980182b10ab7d54bfed3c964073a0ee172f3daa62325af021a68f707511a"
+ESP32_SIG_HEX = (
+    "13e8263b390e72e6b6ce43e964a3a3fd811f494432a1aa96dc1f46e657f6558f"
+    "e90d34df6f97e4076ef04032668d1b1e3e17fd01f57bed3d8395e863b94e3f0a"
+)
 ESP32_VECTOR = {
     "args": ("esp32-01", "2026-10-19T11:05:00Z", 21.4, 12.35, 23.5, 61.0),
     "canonical": (
@@ -57,7 +63,7 @@ def test_strings_and_floats_give_same_bytes():
 def test_esp32_test_vector():
     assert canonicalize(*ESP32_VECTOR["args"]) == ESP32_VECTOR["canonical"]
     sk = SigningKey(bytes.fromhex(ESP32_SEED_HEX))
-    sig = sign(sk, ESP32_VECTOR["canonical"])
-    assert verify(sk.verify_key.encode().hex(), ESP32_VECTOR["canonical"], sig)
+    assert sk.verify_key.encode().hex() == ESP32_PUB_HEX
     # Ed25519 is deterministic: this is the signature the firmware README lists.
-    assert sig == sign(sk, ESP32_VECTOR["canonical"])
+    assert sign(sk, ESP32_VECTOR["canonical"]) == ESP32_SIG_HEX
+    assert verify(ESP32_PUB_HEX, ESP32_VECTOR["canonical"], ESP32_SIG_HEX)

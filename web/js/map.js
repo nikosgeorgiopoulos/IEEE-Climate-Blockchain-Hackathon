@@ -3,11 +3,18 @@
 
 Topbar.init("index");
 
-const map = L.map("map", { zoomControl: true, attributionControl: true }).setView([37.99, 23.73], 11);
-L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-  maxZoom: 18,
-  attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · data <a href="https://sensor.community">Sensor.Community</a>',
-}).addTo(map);
+// Leaflet comes from a CDN; if it can't load (offline), keep the sidebar working anyway.
+const map = typeof L === "undefined" ? null : L.map("map", { zoomControl: true }).setView([37.99, 23.73], 11);
+if (map) {
+  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+    maxZoom: 18,
+    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors · data <a href="https://sensor.community">Sensor.Community</a>',
+  }).addTo(map);
+} else {
+  document.getElementById("map").replaceChildren(
+    el("div", { class: "empty" }, "The map library (Leaflet, from unpkg.com) could not be loaded. The sensor list on the right still works.")
+  );
+}
 
 const markers = new Map(); // device id -> L.Marker
 let fitted = false;
@@ -73,10 +80,11 @@ function renderList(devices) {
           onclick: () => {
             const m = markers.get(d.id);
             if (m) { map.flyTo(m.getLatLng(), 13, { duration: 0.8 }); m.openPopup(); }
+            else location.href = `/sensor.html?id=${encodeURIComponent(d.id)}`;
           },
         },
         el("span", { class: "swatch", style: { background: pmBand(pm).color, width: "12px", height: "12px" } }),
-        el("span", { class: "name" }, d.name || d.id, " ", sourceTag(d.source)),
+        el("span", { class: "name" }, (d.name || d.id).replace(/ \(simulated\)$/, ""), " ", sourceTag(d.source)),
         el("span", { class: "pm" }, fmt.num(pm)),
         el("span", { class: "mini-badge", style: { background: st.color, color: d.status === "pending" ? "#1a1000" : "#fff" } }, st.icon)
       );
@@ -88,7 +96,7 @@ function renderList(devices) {
 async function refreshDevices() {
   try {
     const devices = (await API.get("/api/devices")).filter((d) => d.lat !== null && d.lon !== null);
-    for (const d of devices) {
+    for (const d of map ? devices : []) {
       let m = markers.get(d.id);
       if (!m) {
         m = L.marker([d.lat, d.lon], { icon: markerIcon(d), riseOnHover: true }).addTo(map);
@@ -99,7 +107,7 @@ async function refreshDevices() {
         m.setPopupContent(popupHtml(d));
       }
     }
-    if (!fitted && devices.length) {
+    if (map && !fitted && devices.length) {
       map.fitBounds(L.latLngBounds(devices.map((d) => [d.lat, d.lon])).pad(0.12), { maxZoom: 12 });
       fitted = true;
     }
